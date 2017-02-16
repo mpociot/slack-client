@@ -371,15 +371,39 @@ class ApiClient
     }
 
     /**
+     * Uploads a file.
+     *
+     * @param \Slack\File $file The file to upload.
+     * @param ChannelInterface $channel The channel to send the message to.
+     *
+     * @return \React\Promise\PromiseInterface
+     */
+    public function fileUpload(File $file, ChannelInterface $channel)
+    {
+        $multipart = !$file->isSnippet();
+
+        $options = [
+            'title' => $file->getTitle(),
+            'content' => !$multipart ? file_get_contents($file->getPath()) : null,
+            'file' => $multipart ? fopen($file->getPath(), 'r') : null,
+            'initial_comment' => $file->getInitialComment(),
+            'channels' => $channel->getId()
+        ];
+
+        return $this->apiCall('files.upload', $options, $multipart);
+    }
+
+    /**
      * Sends an API request.
      *
-     * @param string $method The API method to call.
-     * @param array  $args   An associative array of arguments to pass to the
-     *                       method call.
+     * @param string $method     The API method to call.
+     * @param array  $args       An associative array of arguments to pass to the
+     *                           method call.
+     * @param bool   $multipart  Whether to send as a multipart request. Default to false
      *
      * @return \React\Promise\PromiseInterface A promise for an API response.
      */
-    public function apiCall($method, array $args = [])
+    public function apiCall($method, array $args = [], $multipart = false)
     {
         // create the request url
         $requestUrl = self::BASE_URL . $method;
@@ -388,8 +412,11 @@ class ApiClient
         $args['token'] = $this->token;
 
         // send a post request with all arguments
+        $requestType = $multipart ? 'multipart' : 'form_params';
+        $requestData = $multipart ? $this->convertToMultipartArray($args) : $args;
+
         $promise = $this->httpClient->postAsync($requestUrl, [
-            'form_params' => $args,
+            $requestType => $requestData,
         ]);
 
         // Add requests to the event loop to be handled at a later date.
@@ -417,5 +444,19 @@ class ApiClient
         });
 
         return $deferred->promise();
+    }
+
+    private function convertToMultipartArray(array $options)
+    {
+        $convertedOptions = [];
+
+        foreach ($options as $key => $value) {
+            $convertedOptions[] = [
+                'name' => $key,
+                'contents' => $value,
+            ];
+        }
+
+        return $convertedOptions;
     }
 }
