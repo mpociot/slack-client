@@ -374,11 +374,11 @@ class ApiClient
      * Uploads a file.
      *
      * @param \Slack\File $file The file to upload.
-     * @param ChannelInterface $channel The channel to send the message to.
+     * @param array Array of channel IDs or names to upload the file to.
      *
      * @return \React\Promise\PromiseInterface
      */
-    public function fileUpload(File $file, ChannelInterface $channel)
+    public function fileUpload(File $file, array $channels)
     {
         $multipart = !$file->isSnippet();
 
@@ -387,7 +387,7 @@ class ApiClient
             'content' => !$multipart ? file_get_contents($file->getPath()) : null,
             'file' => $multipart ? fopen($file->getPath(), 'r') : null,
             'initial_comment' => $file->getInitialComment(),
-            'channels' => $channel->getId()
+            'channels' => implode(',', $channels),
         ];
 
         return $this->apiCall('files.upload', $options, $multipart);

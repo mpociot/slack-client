@@ -115,9 +115,7 @@ class ApiClientTest extends TestCase
             ->setFilename($this->faker->name)
             ->setFiletype('png');
 
-        $channel = new Channel($this->client, ['id' => $channelId]);
-
-        $response = $this->client->fileUpload($file, $channel)
+        $response = $this->client->fileUpload($file, [$channelId])
             ->then(function (Payload $response) use ($fileId) {
                 $this->assertEquals($fileId, $response['file']['id']);
 
