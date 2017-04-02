@@ -349,6 +349,36 @@ class RealTimeClient extends ApiClient
     }
 
     /**
+     * Set as typing
+     *
+     * @param \Slack\ChannelInterface $channel The channel to set typing indicator in.
+     * @param bool $callDeferred Whether to call the API asynchronous or not.
+     *
+     * @return \React\Promise\PromiseInterface
+     */
+    public function setAsTyping(ChannelInterface $channel, $callDeferred = true)
+    {
+        if (!$this->connected) {
+            return Promise\reject(new ConnectionException('Client not connected. Did you forget to call `connect()`?'));
+        }
+
+        $data = [
+            'id' => ++$this->lastMessageId,
+            'type' => 'typing',
+            'channel' => $channel->data['id'],
+        ];
+        $this->websocket->send(json_encode($data));
+
+        // Perform an iteration of the event loop in order to send the
+        // web socket message synchronously
+        if (!$callDeferred) {
+            $this->loop->tick();
+        }
+
+        return Promise\resolve();
+    }
+
+    /**
      * Returns whether the client is connected.
      *
      * @return bool
