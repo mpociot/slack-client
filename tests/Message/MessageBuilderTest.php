@@ -53,7 +53,7 @@ class MessageBuilderTest extends TestCase
 
         $this->mockResponse(200, null, [
             'ok' => true,
-            'user' => $user->data,
+            'user' => $user->getRawUser(),
         ]);
 
         $this->watchPromise($message->getUser()->then(function (User $user) {

@@ -473,6 +473,16 @@ class RealTimeClient extends ApiClient
                     $bot = new Bot($this, $payload['bot']);
                     $this->bots[$bot->getId()] = $bot;
                     break;
+
+                case 'team_join':
+                    $user = new User($this, $payload['user']);
+                    $this->users[$user->getId()] = $user;
+                    break;
+
+                case 'user_change':
+                    $user = new User($this, $payload['user']);
+                    $this->users[$user->getId()] = $user;
+                    break;
             }
 
             // emit an event with the attached json

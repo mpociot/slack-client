@@ -93,12 +93,12 @@ class ChannelTest extends TestCase
         $this->mockResponse(200, null, [
             'ok' => true,
             'user' => [
-                'id' => $creator->data['id'],
+                'id' => $creator->getId(),
             ],
         ]);
 
         $this->watchPromise($channel->getCreator()->then(function (User $user) use ($creator) {
-            $this->assertEquals($creator->data, $user->data);
+            $this->assertEquals($creator->getRawUser(), $user->getRawUser());
         }));
     }
 }
