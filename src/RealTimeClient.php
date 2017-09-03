@@ -425,7 +425,7 @@ class RealTimeClient extends ApiClient
                     break;
 
                 case 'channel_deleted':
-                    unset($this->channels[$payload['channel']['id']]);
+                    unset($this->channels[$payload['channel']]);
                     break;
 
                 case 'channel_rename':
