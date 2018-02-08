@@ -5,6 +5,8 @@ use Devristo\Phpws\Client\WebSocket;
 use Devristo\Phpws\Messaging\WebSocketMessageInterface;
 use Evenement\EventEmitterTrait;
 use React\Promise;
+use React\Promise\Timer;
+use React\EventLoop\LoopInterface;
 use Slack\Message\Message;
 
 /**
@@ -66,6 +68,22 @@ class RealTimeClient extends ApiClient
     protected $bots = [];
 
     /**
+     * @var \Zend\Log\Logger Logger for this client
+     */
+    protected $logger = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct(LoopInterface $loop, GuzzleHttp\ClientInterface $httpClient = null)
+    {
+        parent::__construct($loop, $httpClient);
+
+        $this->logger = new \Zend\Log\Logger();
+        $this->logger->addWriter(new \Zend\Log\Writer\Stream('php://stderr'));
+    }
+
+    /**
      * Connects to the real-time messaging server.
      *
      * @return \React\Promise\PromiseInterface
@@ -111,12 +129,9 @@ class RealTimeClient extends ApiClient
                 $this->bots[$data['id']] = new Bot($this, $data);
             }
 
-            // Log PHPWS things to stderr
-            $logger = new \Zend\Log\Logger();
-            $logger->addWriter(new \Zend\Log\Writer\Stream('php://stderr'));
-
             // initiate the websocket connection
-            $this->websocket = new WebSocket($responseData['url'], $this->loop, $logger);
+            // write PHPWS things to the existing logger
+            $this->websocket = new WebSocket($responseData['url'], $this->loop, $this->logger);
             $this->websocket->on('message', function ($message) {
                 $this->onMessage($message);
             });
@@ -349,6 +364,39 @@ class RealTimeClient extends ApiClient
     }
 
     /**
+     * Check the websocket connection by sending a ping
+     *
+     * @param float $timeout The maximum wait time for receiving the pong
+     * @param array $payload Additional payload items
+     *
+     * @return \React\Promise\PromiseInterface
+     */
+    public function checkConnection($timeout = 5.0, $payload = [])
+    {
+        $data = array_merge($payload, [
+            'id' => ++$this->lastMessageId,
+            'type' => 'ping'
+        ]);
+        $this->websocket->send(json_encode($data));
+
+        $deferred = new Promise\Deferred();
+        $this->pendingMessages[$this->lastMessageId] = $deferred;
+
+        $promise = $deferred->promise();
+        return Timer\timeout($promise, $timeout, $this->loop)
+            ->then(function ($value) {
+                // pong received within timeout
+            })
+            ->otherwise(function (Timer\TimeoutException $error) {
+                $this->logger->warning('Lost websocket connection, re-connecting..');
+                $this->disconnect();
+                $this->connect();
+            });
+
+        return $promise;
+    }
+
+    /**
      * Set as typing
      *
      * @param \Slack\ChannelInterface $channel The channel to set typing indicator in.
@@ -480,7 +528,9 @@ class RealTimeClient extends ApiClient
 
             // emit an event with the attached json
             $this->emit($payload['type'], [$payload]);
-        } else {
+        }
+
+        if (!isset($payload['type']) || $payload['type'] == 'pong') {
             // If reply_to is set, then it is a server confirmation for a previously
             // sent message
             if (isset($payload['reply_to'])) {
@@ -488,7 +538,7 @@ class RealTimeClient extends ApiClient
                     $deferred = $this->pendingMessages[$payload['reply_to']];
 
                     // Resolve or reject the promise that was waiting for the reply.
-                    if (isset($payload['ok']) && $payload['ok'] === true) {
+                    if (isset($payload['ok']) && $payload['ok'] === true || $payload['type'] == 'pong') {
                         $deferred->resolve();
                     } else {
                         $deferred->reject($payload['error']);
