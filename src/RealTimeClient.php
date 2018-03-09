@@ -388,12 +388,11 @@ class RealTimeClient extends ApiClient
                 // pong received within timeout
             })
             ->otherwise(function (Timer\TimeoutException $error) {
-                $this->logger->warning('Lost websocket connection, re-connecting..');
+                $this->logger->notice('Lost websocket connection, re-connecting..');
                 $this->disconnect();
                 $this->connect();
+                $this->logger->notice('reconnected');
             });
-
-        return $promise;
     }
 
     /**
