@@ -12,7 +12,7 @@
         "mpociot/phpws": "^2.0",
         "evenement/evenement": "~3.0",
         "guzzlehttp/guzzle": "~6.0",
-        "react/event-loop": "^0.4.1",
+        "react/event-loop": "^0.5",
         "react/promise": "^2.2"
     },
     "require-dev": {
