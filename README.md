@@ -1,10 +1,7 @@
 # PHP Slack API Client
-[![Build](https://img.shields.io/scrutinizer/build/g/sagebind/slack-client.svg)](https://scrutinizer-ci.com/g/sagebind/slack-client)
-[![Version](https://img.shields.io/packagist/v/coderstephen/slack-client.svg)](https://packagist.org/packages/coderstephen/slack-client)
-[![License](https://img.shields.io/packagist/l/coderstephen/slack-client.svg)](https://packagist.org/packages/coderstephen/slack-client)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/sagebind/slack-client.svg)](https://scrutinizer-ci.com/g/sagebind/slack-client)
-[![Code Quality](https://img.shields.io/scrutinizer/g/sagebind/slack-client.svg)](https://scrutinizer-ci.com/g/sagebind/slack-client)
-[![Downloads](https://img.shields.io/packagist/dt/coderstephen/slack-client.svg)](https://packagist.org/packages/coderstephen/slack-client)
+[![Version](https://img.shields.io/packagist/v/mpociot/slack-client.svg)](https://packagist.org/packages/mpociot/slack-client)
+[![License](https://img.shields.io/packagist/l/mpociot/slack-client.svg)](https://packagist.org/packages/mpociot/slack-client)
+[![Downloads](https://img.shields.io/packagist/dt/mpociot/slack-client.svg)](https://packagist.org/packages/mpociot/slack-client)
 
 This is an API client for [Slack](http://slack.com) for PHP clients, with support for the [Real Time Messaging API](http://api.slack.com/rtm) (RTM API) using web sockets.
 
