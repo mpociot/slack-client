@@ -75,7 +75,7 @@ class RealTimeClient extends ApiClient
     /**
      * {@inheritDoc}
      */
-    public function __construct(LoopInterface $loop, GuzzleHttp\ClientInterface $httpClient = null)
+    public function __construct(LoopInterface $loop, \GuzzleHttp\ClientInterface $httpClient = null)
     {
         parent::__construct($loop, $httpClient);
 
