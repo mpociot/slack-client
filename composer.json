@@ -8,18 +8,18 @@
         "email": "me@stephencoakley.com"
     }],
     "require": {
-        "php": ">=5.5",
+        "php": ">=7.3",
         "mpociot/phpws": "^2.0",
         "evenement/evenement": "~3.0",
-        "guzzlehttp/guzzle": "~6.0",
+        "guzzlehttp/guzzle": "~6.0|~7.0",
         "react/event-loop": "^1.0 || ^0.5 || ^0.4",
         "react/promise": "^2.2",
         "react/promise-timer": "^1.2.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.6",
-        "fzaninotto/faker": "~1.4",
-        "apigen/apigen": "^4.1"
+        "phpunit/phpunit": "~9.4",
+        "apigen/apigen": "^4.1",
+        "fakerphp/faker": "^1.13"
     },
     "autoload": {
         "psr-4": {
