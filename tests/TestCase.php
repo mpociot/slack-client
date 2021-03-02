@@ -6,6 +6,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase as BaseTestcase;
 use React\EventLoop\Factory;
 use React\Promise\ExtendedPromiseInterface;
 use Slack\ApiClient;
@@ -13,7 +14,7 @@ use Slack\ApiClient;
 /**
  * Base helper class for test cases for mocking API requests and responses.
  */
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends BaseTestcase
 {
     /**
      * @var \Faker\Generator A Faker fake data generator.
@@ -53,7 +54,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * Sets up a test with some useful mock objects.
      */
-    public function setUp()
+    public function setUp(): void
     {
         // Create a mock handler
         $this->mock = new MockHandler();
@@ -83,7 +84,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * Works in conjunction with watchPromise() to unwrap promise exceptions.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->loop->run();
 
